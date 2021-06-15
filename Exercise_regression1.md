@@ -5,7 +5,6 @@ date: "4/4/2021"
 output:
   html_document:
     keep_md: true
-    df_print: paged
 ---
 
 
@@ -23,11 +22,15 @@ library(dplyr); library(skimr); library(lmtest)
 head(BH_dat)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["animalid"],"name":[1],"type":["int"],"align":["right"]},{"label":["status"],"name":[2],"type":["int"],"align":["right"]},{"label":["exotic"],"name":[3],"type":["chr"],"align":["left"]},{"label":["sexp"],"name":[4],"type":["chr"],"align":["left"]},{"label":["cage"],"name":[5],"type":["chr"],"align":["left"]},{"label":["fsummer2"],"name":[6],"type":["chr"],"align":["left"]},{"label":[".fgspr"],"name":[7],"type":["int"],"align":["right"]},{"label":["dzkid"],"name":[8],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"1","3":"Exotic","4":"Female","5":"3-5 years","6":"Fresh fern","7":"1","8":"18","_rn_":"1"},{"1":"2","2":"0","3":"Exotic","4":"Female","5":"3-5 years","6":"Fresh fern","7":"3","8":"18","_rn_":"2"},{"1":"3","2":"0","3":"Exotic","4":"Male","5":"3-5 years","6":"Fresh fern","7":"2","8":"18","_rn_":"3"},{"1":"4","2":"0","3":"Exotic","4":"Male","5":"3-5 years","6":"Fresh fern","7":"3","8":"18","_rn_":"4"},{"1":"5","2":"0","3":"Local","4":"Male","5":"3-5 years","6":"Fresh fern","7":"3","8":"18","_rn_":"5"},{"1":"6","2":"1","3":"Exotic","4":"Female","5":"6 years","6":"Fresh fern","7":"2","8":"18","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+##   animalid status exotic   sexp      cage   fsummer2 .fgspr dzkid
+## 1        1      1 Exotic Female 3-5 years Fresh fern      1    18
+## 2        2      0 Exotic Female 3-5 years Fresh fern      3    18
+## 3        3      0 Exotic   Male 3-5 years Fresh fern      2    18
+## 4        4      0 Exotic   Male 3-5 years Fresh fern      3    18
+## 5        5      0  Local   Male 3-5 years Fresh fern      3    18
+## 6        6      1 Exotic Female   6 years Fresh fern      2    18
+```
 
 ## Missing data and Descriptive statistics 欠損値および各変数の特徴をつかむ
 
@@ -838,11 +841,17 @@ dzkid                    2               1     9.32     5.58    2     5    10   
     lrtest(model4,model_null)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"-379.8084","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"1","2":"-387.6371","3":"-3","4":"15.65752","5":"0.001332849","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage
+## Model 2: status ~ NULL
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1   4 -379.81                        
+## 2   1 -387.64 -3 15.658   0.001333 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
         # 帰無仮説は「比較した2つのモデルのうち、より複雑なモデルは複雑でないモデルと比較してデータへのあてはまりが同じかそれ以下」
@@ -952,11 +961,17 @@ dzkid                    2               1     9.32     5.58    2     5    10   
         lrtest(model5,model_null2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"-367.6126","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"1","2":"-387.2313","3":"-3","4":"39.23729","5":"1.545944e-08","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2
+## Model 2: status ~ NULL
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1   4 -367.61                         
+## 2   1 -387.23 -3 39.237  1.546e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
           # 無事尤度比検定を行えた
@@ -967,11 +982,17 @@ dzkid                    2               1     9.32     5.58    2     5    10   
         lrtest(model1,model_null3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"-375.8413","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"1","2":"-387.2313","3":"-3","4":"22.77983","5":"4.488297e-05","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ factor(.fgspr)
+## Model 2: status ~ NULL
+##   #Df  LogLik Df Chisq Pr(>Chisq)    
+## 1   4 -375.84                        
+## 2   1 -387.23 -3 22.78  4.488e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
           # p = 4.488e-05
@@ -1016,11 +1037,17 @@ multi_model_null = glm(status~NULL
           lrtest(multi_model_F1,multi_model_F2_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"-367.6126","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-357.7075","3":"3","4":"19.81028","5":"0.0001858234","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2
+## Model 2: status ~ fsummer2 + cage
+##   #Df  LogLik Df Chisq Pr(>Chisq)    
+## 1   4 -367.61                        
+## 2   7 -357.71  3 19.81  0.0001858 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
             # p =0.0001858
@@ -1111,11 +1138,17 @@ multi_model_null = glm(status~NULL
              lrtest(multi_model_F1_fgspr,multi_model_F2_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"-367.3901","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-360.8163","3":"3","4":"13.14743","5":"0.004328387","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2
+## Model 2: status ~ fsummer2 + factor(.fgspr)
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1   4 -367.39                        
+## 2   7 -360.82  3 13.147   0.004328 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
              # p =0.004328
@@ -1196,11 +1229,17 @@ multi_model_null = glm(status~NULL
           lrtest(multi_model_F1,multi_model_F2_3)    
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"-367.6126","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"5","2":"-365.0687","3":"1","4":"5.087729","5":"0.02409573","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2
+## Model 2: status ~ fsummer2 + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1   4 -367.61                       
+## 2   5 -365.07  1 5.0877     0.0241 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
             # p = 0.0241 
@@ -1283,11 +1322,17 @@ multi_model_null = glm(status~NULL
           lrtest(multi_model_F2_1_fgspr,multi_model_F3_1) 
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"7","2":"-357.3106","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"10","2":"-350.5028","3":"3","4":"13.61554","5":"0.003478051","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2 + cage
+## Model 2: status ~ fsummer2 + cage + factor(.fgspr)
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1   7 -357.31                        
+## 2  10 -350.50  3 13.616   0.003478 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
           # p =0.003478
@@ -1375,11 +1420,17 @@ multi_model_null = glm(status~NULL
           lrtest(multi_model_F2_1_sexp,multi_model_F3_2) 
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"7","2":"-357.7075","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-356.1477","3":"1","4":"3.119502","5":"0.07736043","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2 + cage
+## Model 2: status ~ fsummer2 + cage + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1   7 -357.71                       
+## 2   8 -356.15  1 3.1195    0.07736 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
           # p =0.07736
@@ -1466,11 +1517,17 @@ multi_model_null = glm(status~NULL
            lrtest(multi_model_F3_1,multi_model_F4_1) 
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"11","2":"-348.7685","3":"1","4":"3.468507","5":"0.06254774","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2 + cage + factor(.fgspr)
+## Model 2: status ~ fsummer2 + cage + factor(.fgspr) + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1  10 -350.50                       
+## 2  11 -348.77  1 3.4685    0.06255 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
     # p = 0.06255
@@ -1576,11 +1633,15 @@ multi_model_null = glm(status~NULL
      lrtest(multi_model_F3_1,multi_model_F4_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-346.9001","3":"9","4":"7.205415","5":"0.6157422","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2 + cage + factor(.fgspr)
+## Model 2: status ~ fsummer2 + cage + factor(.fgspr) + fsummer2 * cage
+##   #Df LogLik Df  Chisq Pr(>Chisq)
+## 1  10 -350.5                     
+## 2  19 -346.9  9 7.2054     0.6157
+```
 
 ```r
      # p =0.6157
@@ -1591,11 +1652,16 @@ multi_model_null = glm(status~NULL
      lrtest(multi_model_F3_1,multi_model_F4_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-344.9429","3":"9","4":"11.11978","5":"0.2675877","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2 + cage + factor(.fgspr)
+## Model 2: status ~ fsummer2 + cage + factor(.fgspr) + factor(.fgspr) * 
+##     cage
+##   #Df  LogLik Df Chisq Pr(>Chisq)
+## 1  10 -350.50                    
+## 2  19 -344.94  9 11.12     0.2676
+```
 
 ```r
      # p = 0.2676
@@ -1606,11 +1672,18 @@ multi_model_null = glm(status~NULL
      lrtest(multi_model_F3_1,multi_model_F4_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-340.3301","3":"9","4":"20.34533","5":"0.01589681","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ fsummer2 + cage + factor(.fgspr)
+## Model 2: status ~ fsummer2 + cage + factor(.fgspr) + factor(.fgspr) * 
+##     fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1  10 -350.50                       
+## 2  19 -340.33  9 20.345     0.0159 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
      summary(multi_model_F4_3)
@@ -1906,11 +1979,15 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B,multi_model_full_B1_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"-344.8848","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"11","2":"-348.7685","3":"-9","4":"7.767376","5":"0.5577485","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp + cage * fsummer2
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)
+## 1  20 -344.88                     
+## 2  11 -348.77 -9 7.7674     0.5577
+```
 
 ```r
       # p = 0.5577
@@ -1969,11 +2046,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B,multi_model_full_B1_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"-344.8848","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-346.9001","3":"-1","4":"4.030468","5":"0.04468555","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp + cage * fsummer2
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2 + cage * fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1  20 -344.88                       
+## 2  19 -346.90 -1 4.0305    0.04469 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.044
@@ -1984,11 +2067,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B,multi_model_full_B1_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"-344.8848","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"17","2":"-351.1676","3":"-3","4":"12.56546","5":"0.005677091","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp + cage * fsummer2
+## Model 2: status ~ cage + sexp + fsummer2 + cage * fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1  20 -344.88                        
+## 2  17 -351.17 -3 12.566   0.005677 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.005677
@@ -2044,11 +2133,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B1_1,multi_model_full_B2_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"10","2":"-350.5028","3":"-1","4":"3.468507","5":"0.06254774","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1  11 -348.77                       
+## 2  10 -350.50 -1 3.4685    0.06255 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.06255
@@ -2098,11 +2193,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B1_1,multi_model_full_B2_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-365.6510","3":"-3","4":"33.76486","5":"2.221057e-07","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ cage + factor(.fgspr) + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  11 -348.77                         
+## 2   8 -365.65 -3 33.765  2.221e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 2.221e-07
@@ -2150,11 +2251,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B1_1,multi_model_full_B2_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-355.7238","3":"-3","4":"13.9106","5":"0.003029406","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ cage + fsummer2 + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1  11 -348.77                        
+## 2   8 -355.72 -3 13.911   0.003029 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.003029    
@@ -2202,11 +2309,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B1_1,multi_model_full_B2_4)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-358.1463","3":"-3","4":"18.75546","5":"0.0003071456","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ sexp + factor(.fgspr) + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  11 -348.77                         
+## 2   8 -358.15 -3 18.756  0.0003071 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p =  0.0003071
@@ -2301,11 +2414,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B2_1,multi_model_full_B3_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-367.1924","3":"-3","4":"33.37924","5":"2.678792e-07","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ cage + factor(.fgspr)
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  10 -350.50                         
+## 2   7 -367.19 -3 33.379  2.679e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 2.679e-07
@@ -2353,11 +2472,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B2_1,multi_model_full_B3_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-357.3106","3":"-3","4":"13.61554","5":"0.003478051","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ cage + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1  10 -350.50                        
+## 2   7 -357.31 -3 13.616   0.003478 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.003478    
@@ -2404,11 +2529,17 @@ summary(multi_model_full_B)
     lrtest(multi_model_full_B2_1,multi_model_full_B3_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-360.8163","3":"-3","4":"20.62711","5":"0.0001258176","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ factor(.fgspr) + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  10 -350.50                         
+## 2   7 -360.82 -3 20.627  0.0001258 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p =0.0001258
@@ -2524,11 +2655,15 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF,multi_model_full_BF1_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"-344.8848","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"11","2":"-348.7685","3":"-9","4":"7.767376","5":"0.5577485","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp + cage * fsummer2
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)
+## 1  20 -344.88                     
+## 2  11 -348.77 -9 7.7674     0.5577
+```
 
 ```r
       # p = 0.5577
@@ -2587,11 +2722,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF,multi_model_full_BF1_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"-344.8848","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-346.9001","3":"-1","4":"4.030468","5":"0.04468555","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp + cage * fsummer2
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2 + cage * fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1  20 -344.88                       
+## 2  19 -346.90 -1 4.0305    0.04469 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.044
@@ -2602,11 +2743,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF,multi_model_full_BF1_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"20","2":"-344.8848","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"17","2":"-351.1676","3":"-3","4":"12.56546","5":"0.005677091","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp + cage * fsummer2
+## Model 2: status ~ cage + sexp + fsummer2 + cage * fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1  20 -344.88                        
+## 2  17 -351.17 -3 12.566   0.005677 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.005677
@@ -2662,11 +2809,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF1_1,multi_model_full_BF2_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"10","2":"-350.5028","3":"-1","4":"3.468507","5":"0.06254774","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1  11 -348.77                       
+## 2  10 -350.50 -1 3.4685    0.06255 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.06255
@@ -2716,11 +2869,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF1_1,multi_model_full_BF2_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-365.6510","3":"-3","4":"33.76486","5":"2.221057e-07","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ cage + factor(.fgspr) + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  11 -348.77                         
+## 2   8 -365.65 -3 33.765  2.221e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 2.221e-07
@@ -2768,11 +2927,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF1_1,multi_model_full_BF2_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-355.7238","3":"-3","4":"13.9106","5":"0.003029406","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ cage + fsummer2 + sexp
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1  11 -348.77                        
+## 2   8 -355.72 -3 13.911   0.003029 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.003029    
@@ -2820,11 +2985,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF1_1,multi_model_full_BF2_4)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"11","2":"-348.7685","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"8","2":"-358.1463","3":"-3","4":"18.75546","5":"0.0003071456","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2 + sexp
+## Model 2: status ~ sexp + factor(.fgspr) + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  11 -348.77                         
+## 2   8 -358.15 -3 18.756  0.0003071 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p =  0.0003071
@@ -2841,11 +3012,15 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF2_1,multi_model_full_BF2_1_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-346.9001","3":"9","4":"7.205415","5":"0.6157422","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2 + cage * fsummer2
+##   #Df LogLik Df  Chisq Pr(>Chisq)
+## 1  10 -350.5                     
+## 2  19 -346.9  9 7.2054     0.6157
+```
 
 ```r
       # p = 0.6157 なのでモデルには加えない
@@ -2939,11 +3114,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF2_1,multi_model_full_BF3_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-367.1924","3":"-3","4":"33.37924","5":"2.678792e-07","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ cage + factor(.fgspr)
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  10 -350.50                         
+## 2   7 -367.19 -3 33.379  2.679e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 2.679e-07
@@ -2991,11 +3172,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF2_1,multi_model_full_BF3_2)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-357.3106","3":"-3","4":"13.61554","5":"0.003478051","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ cage + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)   
+## 1  10 -350.50                        
+## 2   7 -357.31 -3 13.616   0.003478 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p = 0.003478    
@@ -3042,11 +3229,17 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF2_1,multi_model_full_BF3_3)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"7","2":"-360.8163","3":"-3","4":"20.62711","5":"0.0001258176","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ factor(.fgspr) + fsummer2
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1  10 -350.50                         
+## 2   7 -360.82 -3 20.627  0.0001258 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ```r
       # p =0.0001258
@@ -3062,11 +3255,15 @@ summary(multi_model_full_BF)
     lrtest(multi_model_full_BF2_1,multi_model_full_BF2_1_1)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["#Df"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["LogLik"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Chisq"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Pr(>Chisq)"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"10","2":"-350.5028","3":"NA","4":"NA","5":"NA","_rn_":"1"},{"1":"19","2":"-346.9001","3":"9","4":"7.205415","5":"0.6157422","_rn_":"2"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
+```
+## Likelihood ratio test
+## 
+## Model 1: status ~ cage + factor(.fgspr) + fsummer2
+## Model 2: status ~ cage + factor(.fgspr) + fsummer2 + cage * fsummer2
+##   #Df LogLik Df  Chisq Pr(>Chisq)
+## 1  10 -350.5                     
+## 2  19 -346.9  9 7.2054     0.6157
+```
 
 ```r
       # p = 0.6157 なのでモデルには加えない
