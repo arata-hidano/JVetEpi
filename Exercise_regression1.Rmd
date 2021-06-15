@@ -189,6 +189,7 @@ skim(BH_dat)
 ```
 
 ## Construct multivariable models 多変量モデル
+## Method 1: Forward selection
 ```{r, error = TRUE}
 # Multivariable analysis 多変量モデル
 
@@ -196,7 +197,7 @@ skim(BH_dat)
 # 代表的なものはforward-selection, backward-selection, backward-forward-selection
 # 以下それぞれの手法を見ていく
 
-# Method 1: Forward selection
+
 # 始めにNULLモデル、つまり切片だけのモデルからスタートし各変数を重要度の順に従ってモデルに加えていく
 # 重要度は研究目的に沿って自分で決める。多く使われる指標は単変量解析時のp値の小さな順など
 
@@ -336,9 +337,8 @@ summary(multi_model_F3_1)
     # cage9+yearsの係数はfsummer2の投入によって (1.0449- 0.86547)/1.0449=0.17つまり17%変化している
     # 交絡要因とみなす基準はまちまちだが25%-35%の増減を基準とする場合が多い。今回はこれを交絡とはみなさない
 ```
-
+## Method 2: Backward elimination
 ```{r, error = TRUE}
-# Method 2: Backward elimination
 # 始めに単変量解析でスクリーニングした変数、およびそれらの交互作用を含んだモデルを作成（フルモデル）
 # 交互作用について：2変数間もしくはそれ以上の変数間の交互作用を作れるが通常3変数間以上の交互作用は解釈が難しい
 # よって2変数間の交互作用のみを今回は含める
@@ -444,8 +444,8 @@ summary(multi_model_full_B)
 ```
 
 
+## Method 3: Backward elimination + forward selection
 ```{r, error = TRUE}
-# Method 3: Backward elimination + forward selection
 # Backward eliminationのみのプロセスと同様、始めに単変量解析でスクリーニングした変数、およびそれらの交互作用を含んだモデルを作成（フルモデル）
 # Method 2との違いはBackward eliminationで変数を除去するたびに、既に除去された変数(もしくは交互作用)をモデルに戻す
 # この作業によって特定の変数の存在によって隠れていた関係を(その変数を除くことで)明らかにできる可能性がある

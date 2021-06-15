@@ -84,7 +84,7 @@ Data summary
 
 ``` r
     ### skim()がエラーを返す時は最新のdplyrとskimrパッケージがインストールされているか確認。
-    ### ここでn_missingに注目。全ての変数に欠損データがあることを確認しておこう
+    ### ここでn_missingに注目。変数に欠損データがあることを確認しておこう
 ```
 
 ``` r
@@ -512,7 +512,7 @@ Data summary
 ``` r
   # fsummer2と.fgspr
     
-    CrossTable(BH_dat$fsummer2, BH_dat$.fgspr,chisq = T) #  p =  5.674029e-15
+    CrossTable(BH_dat$fsummer2, BH_dat$.fgspr,chisq = T) #  p =  8.514364e-15
 ```
 
     ## Warning in chisq.test(t, correct = FALSE, ...): Chi-squared approximation may be
@@ -618,8 +618,8 @@ Data summary
 
 ``` r
         # 月数と係数には単調な増減関係は認められない
-          # 参照値である(.fgspr)0と比較して(.fgspr)3の係数は0.43で(.fgspr)2の1.02より減少している
-          # さらにp値を確認しても0.02/0.03と、目的変数と強い関連があることが示唆される
+          # 参照値である(.fgspr)0と比較して(.fgspr)3の係数は0.7374で(.fgspr)2の1.5892 より減少している
+          # さらにp値を確認しても目的変数と強い関連があることが示唆される
   
       # この時点で.fgsprを連続変数として使ってはいけないことが明らかであるが、連続変数として扱った場合の係数を見てみる
       model1_1 = glm(status~.fgspr,data=BH_dat,family="binomial")
@@ -651,7 +651,7 @@ Data summary
     ## Number of Fisher Scoring iterations: 4
 
 ``` r
-            # 月数が1増えるごとに係数は0.13増えるという推定結果
+            # 月数が1増えるごとに係数は0.2248増えるという推定結果
             # カテゴリカル変数として扱った場合に確認された(.fgspr)3の係数が(.fgspr)2より低い、という結果と矛盾している
             # よって.fgsprは連続変数として扱ってはいけない
   
@@ -915,6 +915,8 @@ Data summary
 
 ## Construct multivariable models 多変量モデル
 
+## Method 1: Forward selection
+
 ``` r
 # Multivariable analysis 多変量モデル
 
@@ -922,7 +924,7 @@ Data summary
 # 代表的なものはforward-selection, backward-selection, backward-forward-selection
 # 以下それぞれの手法を見ていく
 
-# Method 1: Forward selection
+
 # 始めにNULLモデル、つまり切片だけのモデルからスタートし各変数を重要度の順に従ってモデルに加えていく
 # 重要度は研究目的に沿って自分で決める。多く使われる指標は単変量解析時のp値の小さな順など
 
@@ -1726,8 +1728,9 @@ summary(multi_model_F3_1)
     # 交絡要因とみなす基準はまちまちだが25%-35%の増減を基準とする場合が多い。今回はこれを交絡とはみなさない
 ```
 
+## Method 2: Backward elimination
+
 ``` r
-# Method 2: Backward elimination
 # 始めに単変量解析でスクリーニングした変数、およびそれらの交互作用を含んだモデルを作成（フルモデル）
 # 交互作用について：2変数間もしくはそれ以上の変数間の交互作用を作れるが通常3変数間以上の交互作用は解釈が難しい
 # よって2変数間の交互作用のみを今回は含める
@@ -2360,8 +2363,9 @@ summary(multi_model_full_B)
 # 最終モデルは　multi_model_full_B2_1
 ```
 
+## Method 3: Backward elimination + forward selection
+
 ``` r
-# Method 3: Backward elimination + forward selection
 # Backward eliminationのみのプロセスと同様、始めに単変量解析でスクリーニングした変数、およびそれらの交互作用を含んだモデルを作成（フルモデル）
 # Method 2との違いはBackward eliminationで変数を除去するたびに、既に除去された変数(もしくは交互作用)をモデルに戻す
 # この作業によって特定の変数の存在によって隠れていた関係を(その変数を除くことで)明らかにできる可能性がある
