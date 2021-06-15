@@ -29,22 +29,22 @@ head(BH_dat)
 summary(BH_dat)
 ```
 
-    ##     animalid         status          exotic              sexp          
-    ##  Min.   :  1.0   Min.   :0.0000   Length:611         Length:611        
-    ##  1st Qu.:141.0   1st Qu.:0.0000   Class :character   Class :character  
-    ##  Median :276.0   Median :0.0000   Mode  :character   Mode  :character  
-    ##  Mean   :275.2   Mean   :0.3333                                        
-    ##  3rd Qu.:412.0   3rd Qu.:1.0000                                        
-    ##  Max.   :542.0   Max.   :1.0000                                        
-    ##  NA's   :2       NA's   :2                                             
-    ##      cage             fsummer2             .fgspr          dzkid       
-    ##  Length:611         Length:611         Min.   :0.000   Min.   : 2.000  
-    ##  Class :character   Class :character   1st Qu.:0.000   1st Qu.: 5.000  
-    ##  Mode  :character   Mode  :character   Median :3.000   Median :10.000  
-    ##                                        Mean   :1.857   Mean   : 9.317  
-    ##                                        3rd Qu.:3.000   3rd Qu.:12.000  
-    ##                                        Max.   :3.000   Max.   :19.000  
-    ##                                        NA's   :2       NA's   :2
+    ##     animalid       status          exotic              sexp          
+    ##  Min.   :  1   Min.   :0.0000   Length:609         Length:609        
+    ##  1st Qu.:153   1st Qu.:0.0000   Class :character   Class :character  
+    ##  Median :305   Median :0.0000   Mode  :character   Mode  :character  
+    ##  Mean   :305   Mean   :0.3333                                        
+    ##  3rd Qu.:457   3rd Qu.:1.0000                                        
+    ##  Max.   :609   Max.   :1.0000                                        
+    ##                                                                      
+    ##      cage             fsummer2             .fgspr         dzkid       
+    ##  Length:609         Length:609         Min.   :0.00   Min.   : 2.000  
+    ##  Class :character   Class :character   1st Qu.:0.00   1st Qu.: 5.000  
+    ##  Mode  :character   Mode  :character   Median :3.00   Median :10.000  
+    ##                                        Mean   :1.86   Mean   : 9.317  
+    ##                                        3rd Qu.:3.00   3rd Qu.:12.000  
+    ##                                        Max.   :3.00   Max.   :19.000  
+    ##                                        NA's   :1
 
 ``` r
 skim(BH_dat)
@@ -53,7 +53,7 @@ skim(BH_dat)
 |                                                  |         |
 |:-------------------------------------------------|:--------|
 | Name                                             | BH\_dat |
-| Number of rows                                   | 611     |
+| Number of rows                                   | 609     |
 | Number of columns                                | 8       |
 | \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_   |         |
 | Column type frequency:                           |         |
@@ -68,19 +68,19 @@ Data summary
 
 | skim\_variable | n\_missing | complete\_rate | min | max | empty | n\_unique | whitespace |
 |:---------------|-----------:|---------------:|----:|----:|------:|----------:|-----------:|
-| exotic         |         12 |           0.98 |   5 |   6 |     0 |         2 |          0 |
-| sexp           |          2 |           1.00 |   4 |   6 |     0 |         2 |          0 |
-| cage           |          2 |           1.00 |   7 |   9 |     0 |         4 |          0 |
+| exotic         |         10 |           0.98 |   5 |   6 |     0 |         2 |          0 |
+| sexp           |          0 |           1.00 |   4 |   6 |     0 |         2 |          0 |
+| cage           |          0 |           1.00 |   7 |   9 |     0 |         4 |          0 |
 | fsummer2       |          1 |           1.00 |   7 |  10 |     0 |         4 |          0 |
 
 **Variable type: numeric**
 
 | skim\_variable | n\_missing | complete\_rate |   mean |     sd |  p0 | p25 | p50 | p75 | p100 | hist  |
 |:---------------|-----------:|---------------:|-------:|-------:|----:|----:|----:|----:|-----:|:------|
-| animalid       |          2 |              1 | 275.20 | 154.59 |   1 | 141 | 276 | 412 |  542 | ▇▇▇▇▇ |
-| status         |          2 |              1 |   0.33 |   0.47 |   0 |   0 |   0 |   1 |    1 | ▇▁▁▁▃ |
-| .fgspr         |          2 |              1 |   1.86 |   1.40 |   0 |   0 |   3 |   3 |    3 | ▅▁▁▁▇ |
-| dzkid          |          2 |              1 |   9.32 |   5.58 |   2 |   5 |  10 |  12 |   19 | ▇▆▇▂▅ |
+| animalid       |          0 |              1 | 305.00 | 175.95 |   1 | 153 | 305 | 457 |  609 | ▇▇▇▇▇ |
+| status         |          0 |              1 |   0.33 |   0.47 |   0 |   0 |   0 |   1 |    1 | ▇▁▁▁▃ |
+| .fgspr         |          1 |              1 |   1.86 |   1.40 |   0 |   0 |   3 |   3 |    3 | ▅▁▁▁▇ |
+| dzkid          |          0 |              1 |   9.32 |   5.58 |   2 |   5 |  10 |  12 |   19 | ▇▆▇▂▅ |
 
 ``` r
     ### skim()がエラーを返す時は最新のdplyrとskimrパッケージがインストールされているか確認。
@@ -132,7 +132,7 @@ Data summary
 
     ## 
     ##   Dry fern Fresh fern    No fern Not housed 
-    ##         72        204        213        121
+    ##         72        204        211        121
 
 ``` r
     # 因子型に変換。今回は参照値を"No fern"に変更する
@@ -149,7 +149,7 @@ Data summary
 
     ## 
     ##   0   1   2   3 
-    ## 208  24  24 353
+    ## 207  24  24 353
 
 ## Associations between explanatory variables 説明変数同士の関係を把握する
 
@@ -530,38 +530,38 @@ Data summary
     ## |-------------------------|
     ## 
     ##  
-    ## Total Observations in Table:  608 
+    ## Total Observations in Table:  607 
     ## 
     ##  
     ##                 | BH_dat$.fgspr 
     ## BH_dat$fsummer2 |         0 |         1 |         2 |         3 | Row Total | 
     ## ----------------|-----------|-----------|-----------|-----------|-----------|
-    ##         No fern |       114 |         2 |         7 |        88 |       211 | 
-    ##                 |    24.224 |     4.809 |     0.212 |     9.551 |           | 
-    ##                 |     0.540 |     0.009 |     0.033 |     0.417 |     0.347 | 
-    ##                 |     0.548 |     0.083 |     0.292 |     0.250 |           | 
-    ##                 |     0.188 |     0.003 |     0.012 |     0.145 |           | 
+    ##         No fern |       113 |         2 |         7 |        88 |       210 | 
+    ##                 |    23.916 |     4.785 |     0.205 |     9.370 |           | 
+    ##                 |     0.538 |     0.010 |     0.033 |     0.419 |     0.346 | 
+    ##                 |     0.546 |     0.083 |     0.292 |     0.250 |           | 
+    ##                 |     0.186 |     0.003 |     0.012 |     0.145 |           | 
     ## ----------------|-----------|-----------|-----------|-----------|-----------|
     ##        Dry fern |        21 |         4 |         6 |        41 |        72 | 
-    ##                 |     0.535 |     0.472 |     3.509 |     0.011 |           | 
-    ##                 |     0.292 |     0.056 |     0.083 |     0.569 |     0.118 | 
+    ##                 |     0.514 |     0.467 |     3.493 |     0.014 |           | 
+    ##                 |     0.292 |     0.056 |     0.083 |     0.569 |     0.119 | 
     ##                 |     0.101 |     0.167 |     0.250 |     0.116 |           | 
-    ##                 |     0.035 |     0.007 |     0.010 |     0.067 |           | 
+    ##                 |     0.035 |     0.007 |     0.010 |     0.068 |           | 
     ## ----------------|-----------|-----------|-----------|-----------|-----------|
     ##      Fresh fern |        63 |        12 |         9 |       120 |       204 | 
-    ##                 |     0.661 |     1.935 |     0.111 |     0.030 |           | 
+    ##                 |     0.620 |     1.919 |     0.108 |     0.024 |           | 
     ##                 |     0.309 |     0.059 |     0.044 |     0.588 |     0.336 | 
-    ##                 |     0.303 |     0.500 |     0.375 |     0.341 |           | 
-    ##                 |     0.104 |     0.020 |     0.015 |     0.197 |           | 
+    ##                 |     0.304 |     0.500 |     0.375 |     0.341 |           | 
+    ##                 |     0.104 |     0.020 |     0.015 |     0.198 |           | 
     ## ----------------|-----------|-----------|-----------|-----------|-----------|
     ##      Not housed |        10 |         6 |         2 |       103 |       121 | 
-    ##                 |    23.811 |     0.314 |     1.614 |    15.496 |           | 
+    ##                 |    23.687 |     0.309 |     1.620 |    15.362 |           | 
     ##                 |     0.083 |     0.050 |     0.017 |     0.851 |     0.199 | 
     ##                 |     0.048 |     0.250 |     0.083 |     0.293 |           | 
-    ##                 |     0.016 |     0.010 |     0.003 |     0.169 |           | 
+    ##                 |     0.016 |     0.010 |     0.003 |     0.170 |           | 
     ## ----------------|-----------|-----------|-----------|-----------|-----------|
-    ##    Column Total |       208 |        24 |        24 |       352 |       608 | 
-    ##                 |     0.342 |     0.039 |     0.039 |     0.579 |           | 
+    ##    Column Total |       207 |        24 |        24 |       352 |       607 | 
+    ##                 |     0.341 |     0.040 |     0.040 |     0.580 |           | 
     ## ----------------|-----------|-----------|-----------|-----------|-----------|
     ## 
     ##  
@@ -570,7 +570,7 @@ Data summary
     ## 
     ## Pearson's Chi-squared test 
     ## ------------------------------------------------------------
-    ## Chi^2 =  87.2943     d.f. =  9     p =  5.674029e-15 
+    ## Chi^2 =  86.41327     d.f. =  9     p =  8.514364e-15 
     ## 
     ## 
     ## 
@@ -611,7 +611,7 @@ Data summary
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 751.68  on 604  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 759.68
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -645,7 +645,7 @@ Data summary
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 761.76  on 606  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 765.76
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -679,7 +679,7 @@ Data summary
     ## 
     ##     Null deviance: 760.21  on 598  degrees of freedom
     ## Residual deviance: 758.17  on 597  degrees of freedom
-    ##   (12 observations deleted due to missingness)
+    ##   (10 observations deleted due to missingness)
     ## AIC: 762.17
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -715,7 +715,6 @@ Data summary
     ## 
     ##     Null deviance: 775.27  on 608  degrees of freedom
     ## Residual deviance: 771.32  on 607  degrees of freedom
-    ##   (2 observations deleted due to missingness)
     ## AIC: 775.32
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -751,7 +750,6 @@ Data summary
     ## 
     ##     Null deviance: 775.27  on 608  degrees of freedom
     ## Residual deviance: 759.62  on 605  degrees of freedom
-    ##   (2 observations deleted due to missingness)
     ## AIC: 767.62
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -811,7 +809,7 @@ Data summary
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 735.23  on 604  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 743.23
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -848,7 +846,6 @@ Data summary
     ##     -0.6931  
     ## 
     ## Degrees of Freedom: 608 Total (i.e. Null);  608 Residual
-    ##   (2 observations deleted due to missingness)
     ## Null Deviance:       775.3 
     ## Residual Deviance: 775.3     AIC: 777.3
 
@@ -865,7 +862,7 @@ Data summary
     ##            -1.3922              1.7287              0.8075              0.9034  
     ## 
     ## Degrees of Freedom: 607 Total (i.e. Null);  604 Residual
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## Null Deviance:       774.5 
     ## Residual Deviance: 735.2     AIC: 743.2
 
@@ -991,7 +988,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 715.41  on 601  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 729.41
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1021,7 +1018,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 735.23  on 604  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 743.23
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1084,7 +1081,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 721.63  on 600  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 735.63
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1114,7 +1111,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 735.23  on 604  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 743.23
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1167,7 +1164,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 730.14  on 603  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 740.14
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1197,7 +1194,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 735.23  on 604  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 743.23
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1259,7 +1256,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1293,7 +1290,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 715.41  on 601  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 729.41
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1349,7 +1346,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 712.30  on 600  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 728.3
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1383,7 +1380,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 715.41  on 601  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 729.41
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1443,7 +1440,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 697.54  on 596  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 719.54
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1480,7 +1477,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1596,7 +1593,7 @@ multi_model_null = glm(status~NULL
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 680.66  on 588  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 718.66
     ## 
     ## Number of Fisher Scoring iterations: 15
@@ -1638,7 +1635,7 @@ summary(multi_model_F3_1)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1653,7 +1650,7 @@ summary(multi_model_F3_1)
 
     ##             
     ##                0   1   2   3
-    ##   No fern    114   2   7  88
+    ##   No fern    113   2   7  88
     ##   Dry fern    21   4   6  41
     ##   Fresh fern  63  12   9 120
     ##   Not housed  10   6   2 103
@@ -1686,7 +1683,6 @@ summary(multi_model_F3_1)
     ## 
     ##     Null deviance: 775.27  on 608  degrees of freedom
     ## Residual deviance: 759.62  on 605  degrees of freedom
-    ##   (2 observations deleted due to missingness)
     ## AIC: 767.62
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1720,7 +1716,7 @@ summary(multi_model_F3_1)
     ## 
     ##     Null deviance: 774.46  on 607  degrees of freedom
     ## Residual deviance: 715.41  on 601  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 729.41
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1782,7 +1778,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 689.77  on 587  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 729.77
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1825,7 +1821,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 697.54  on 596  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 719.54
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1888,7 +1884,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 693.80  on 588  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 731.8
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -1969,7 +1965,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2023,7 +2019,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 731.30  on 599  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 747.3
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2079,7 +2075,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 711.45  on 599  degrees of freedom
-    ##   (2 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 727.45
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2133,7 +2129,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 716.29  on 599  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 732.29
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2193,7 +2189,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 734.38  on 600  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 748.38
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2231,7 +2227,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2285,7 +2281,7 @@ summary(multi_model_full_B)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 714.62  on 600  degrees of freedom
-    ##   (2 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 728.62
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2414,7 +2410,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 689.77  on 587  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 729.77
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2457,7 +2453,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 697.54  on 596  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 719.54
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2520,7 +2516,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 693.80  on 588  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 731.8
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2601,7 +2597,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2655,7 +2651,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 731.30  on 599  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 747.3
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2711,7 +2707,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 711.45  on 599  degrees of freedom
-    ##   (2 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 727.45
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2765,7 +2761,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 716.29  on 599  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 732.29
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2847,7 +2843,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 734.38  on 600  degrees of freedom
-    ##   (3 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 748.38
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2885,7 +2881,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 701.01  on 597  degrees of freedom
-    ##   (4 observations deleted due to missingness)
+    ##   (2 observations deleted due to missingness)
     ## AIC: 721.01
     ## 
     ## Number of Fisher Scoring iterations: 4
@@ -2939,7 +2935,7 @@ summary(multi_model_full_BF)
     ## 
     ##     Null deviance: 773.65  on 606  degrees of freedom
     ## Residual deviance: 714.62  on 600  degrees of freedom
-    ##   (2 observations deleted due to missingness)
+    ##   (1 observation deleted due to missingness)
     ## AIC: 728.62
     ## 
     ## Number of Fisher Scoring iterations: 4

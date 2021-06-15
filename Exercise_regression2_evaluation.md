@@ -337,7 +337,7 @@ predicted_cp1[predicted_cp1$cpid==41,][1,] # 3-5 years, Dry fern, .fgspr = 2
 ```
 
     ##     animalid status exotic sexp      cage fsummer2 .fgspr dzkid cpid       fit
-    ## 233      240      1  Local Male 3-5 years Dry fern      2    12   41 0.7566584
+    ## 233      233      1  Local Male 3-5 years Dry fern      2    12   41 0.7566584
 
 ``` r
 nrow(predicted_cp1[predicted_cp1$cpid==41,]) # 6
