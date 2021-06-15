@@ -1,0 +1,150 @@
+---
+title: "モデルの評価"
+author: "Arata Hidano"
+date: "4/25/2021"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import data データを取り込み
+
+```{r,message=F}
+# Set directory
+setwd("D://tem")
+BH_dat = read.csv("BH_dat_adjusted.csv",header=T)
+library(epiR); library(ResourceSelection); library(rms); library(ggplot2); library(pROC); library(ggrepel)
+
+# Check data データが存在するか確認
+head(BH_dat)
+
+# 変数の型の調整
+BH_dat$fsummer2 = factor(BH_dat$fsummer2,levels=c("No fern","Dry fern","Fresh fern","Not housed"))
+BH_dat$cage = factor(BH_dat$cage)　
+                # cageはcharacter(文字列型)なのでモデル内ではfactor(因子型)と同じように扱われる。しかし今回以下で使用する関数はfactorに変換しないとエラーが出るものがあるため、明示的にcharacterをfactorに変換しておく。
+BH_dat$.fgspr = factor(BH_dat$.fgspr)
+# 目的変数および最終モデルに残った説明変数に欠損値のあるデータを除いておく
+BH_dat = BH_dat[!is.na(BH_dat$status),]
+BH_dat = BH_dat[!is.na(BH_dat$cage) & !is.na(BH_dat$.fgspr) & !is.na(BH_dat$fsummer2),]
+
+# Final model
+multi_model_full_BF2_1 = glm(status~cage + factor(.fgspr) + fsummer2
+                              ,data=BH_dat,family="binomial")
+```
+
+## Model evaluation 1: overall goodness of fit using residual
+```{r}
+BH_mf1 = model.frame(multi_model_full_BF2_1)
+
+# Extract unique covariate pattern 説明変数の組み合わせパターンを抜き出す
+BH_cp1 = epi.cp(BH_mf1[-1]) ## [-1]とするのはここでは目的変数には興味がないため、一つ目の変数であるstatusを除去している
+BH_cp1 
+    ### 独自の説明変数のパターンにidが与えられ、各行（データポイント）がどの変数パターンに属しているか変数パターンのidが表示される
+
+# Prediction of outcome values based on explanatory variables 各変数パターンについて目的変数を最終モデルを使って予測する
+
+predicted_cp1 = data.frame(BH_dat , cpid = BH_cp1$id, fit = fitted(multi_model_full_BF2_1))
+
+head(predicted_cp1)
+      # cpidは変数パターンを示したid、fitは最終モデルを利用した目的変数の推定値(1を取る確率)　同じcpidを持つデータポイントは同じfitを持つことに着目しよう
+
+# Pearson chi-squared test based on covariate pattern　説明変数のパターンを用いたピアソンテスト
+
+  # まずそれぞれの説明変数パターンがどれだけ目的変数1を取ったか集計する（観測値の集計）
+BH_obs01 = as.vector(by(predicted_cp1$status, as.factor(predicted_cp1$cpid), FUN =
+sum))
+
+        sum(BH_obs01)　#　確認:合計で203のデータが目的変数1を取っている
+
+  # 次に各変数パターンがとった目的変数の予測値を摘出
+BH_fit01 = as.vector(by(predicted_cp1$fit , as.factor(predicted_cp1$cpid), FUN = min))
+
+  # epi.cpresidsを使って各種残差(residual)を計算
+BH_res01  = epi.cpresids(obs = BH_obs01, fit = BH_fit01, covpattern = BH_cp1)
+
+  # 自由度を計算
+df = max(BH_cp1$id) - (length(multi_model_full_BF2_1$coefficients) - 1) - 1
+
+  # ピアソン残差を用いた評価
+        pearson = sum(BH_res01$pearson^2)
+        pearson
+        1 - pchisq(pearson,df)
+            # 0.2076079
+  # 逸脱残差を用いた評価
+        deviance = sum(BH_res01$deviance^2)
+        1 - pchisq(deviance,df)
+            # 0.0515333
+
+  # Hosmer-Lemeshow test
+  # hoslem.test function (in ResourceSelection package)で実行可能
+  # 様々な理由からHosmer-Lemeshow testは最近推奨されない。以下のThe le Cessie-van Houwelingen normal testを参照
+        hoslem.test(x = predicted_cp1$status, y = predicted_cp1$fit, g = 10)
+          # x = observed values, y = expected value, g = number of groups
+          # p-value = 0.7761
+      
+        
+  # The le Cessie-van Houwelingen normal test
+  # residuals function (in rms package)
+        lrm01 = lrm(status~cage + .fgspr + fsummer2,data=BH_dat, x = TRUE, y = TRUE)
+              # residuals で使うためにlrmを使ってモデルを書き直す                      
+        lrm01.res01 = residuals(lrm01, type = "gof")
+        lrm01.res01
+           # p =0.2805432
+```
+
+## Model evaluation 2: Model predictivity using ROC Curve
+```{r}
+# Extract predicted value
+predicted_value = sort(unique(predicted_cp1$fit))
+
+# For each cut-off point, calculate sensitivity (how many true positives are considered positive) and specificity (how many true negatives are considered negative)
+Se = Sp = c()
+for(i in 1:length(predicted_value))
+{
+  tmp_value = predicted_cp1$fit - predicted_value[i]
+  tmp_status = ifelse(tmp_value>=0,1,0)
+  Se = c(Se,sum(ifelse(predicted_cp1$status==1 & tmp_status == predicted_cp1$status,1,0))/sum(predicted_cp1$status))
+  Sp = c(Sp,sum(ifelse(predicted_cp1$status==0 & tmp_status == predicted_cp1$status,1,0))/(nrow(predicted_cp1)-sum(predicted_cp1$status)))
+}
+ROC_curve.dta = cbind.data.frame(y=Se,x=(1-Sp))
+ggplot(data=ROC_curve.dta,aes(x=x,y=y))+geom_line()+labs(x="Proportion of false positive (1-Sp)",y="Proportion of true positive (Se)")+geom_abline(intercept=0,slope=1,color="red")+
+  scale_x_continuous(limits=c(0,1))+ scale_y_continuous(limits=c(0,1))+
+  theme_bw()
+
+# Calculate AUC
+auc(predicted_cp1$status,predicted_cp1$fit) #0.6988
+```
+
+## Model evaluation 3: Local goodness of fit. Identifying outliers using Pearson residual
+```{r}
+# BH_res01には既に標準化されたピアソン残差が含まれている
+BH_res01$spearson
+    # Not run: Below manipulating data to make covariate pattern 20 to have a large standardized Pearson residual
+    # BH_res02 = BH_res01
+    # BH_res02[which(BH_res02$cpid==20),]$spearson = 4.6
+    # ggplot(data=BH_res02,aes(x=cpid,y=spearson)) + geom_point()+ geom_hline(yintercept=-3,linetype="dotted") + geom_hline(yintercept=3,linetype="dotted") +
+    #   geom_point(data=BH_res02[BH_res02$cpid==20,],
+    #              pch=21, fill=NA, size=4, colour="red", stroke=1) +
+    #   labs(x="Covariate pattern", y="Standardized Pearson residual") + theme_bw()
+
+# Plot standardized Pearson residuals across covariate patterns
+ggplot(data=BH_res01,aes(x=cpid,y=spearson)) + geom_point()+ geom_hline(yintercept=-3,linetype="dotted") + geom_hline(yintercept=3,linetype="dotted") +
+  labs(x="Covariate pattern", y="Standardized Pearson residual") + theme_bw()
+
+```
+
+## Model evaluation 4: Local goodness of fit. Identifying important observations using delta-betas
+```{r}
+# Represent the effect of each covariate pattern or observation on coefficients of variables included in the model
+BH_res01$predicted = BH_fit01
+ggplot(BH_res01,aes(x=predicted,y=deltabeta)) + geom_point() + labs(x="Predicted probability", y ="Pregibon Delta Beta") +
+  geom_label_repel(aes(label=cpid),box.padding   = 0.1, point.padding = 0.1) +theme_bw()
+
+# Check what the pattern 6 and 41 are;
+predicted_cp1[predicted_cp1$cpid==6,][1,] # 7-8 years, No fern, .fgspr = 3
+nrow(predicted_cp1[predicted_cp1$cpid==6,]) # 26
+predicted_cp1[predicted_cp1$cpid==41,][1,] # 3-5 years, Dry fern, .fgspr = 2
+nrow(predicted_cp1[predicted_cp1$cpid==41,]) # 6
+```

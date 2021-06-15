@@ -1,0 +1,592 @@
+---
+title: "回帰モデルの選択"
+author: "Arata Hidano"
+date: "4/4/2021"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import data データを取り込み
+
+```{r,message=F}
+# Set directory
+setwd("D://tem")
+BH_dat = read.csv("BH_dat_adjusted.csv",header=T)
+library(dplyr); library(skimr); library(lmtest)
+
+# Check data データが存在するか確認
+head(BH_dat)
+
+```
+
+## Missing data and Descriptive statistics 欠損値および各変数の特徴をつかむ
+
+```{r}
+summary(BH_dat)
+skim(BH_dat)
+    ### skim()がエラーを返す時は最新のdplyrとskimrパッケージがインストールされているか確認。
+    ### ここでn_missingに注目。変数に欠損データがあることを確認しておこう
+```
+```{r}
+# check the level of categorical variables カテゴリカル変数の取る値を確認
+
+  # 牛の種類
+  table(BH_dat$exotic)
+  # 性別
+  table(BH_dat$sexp)
+  # 年齢
+  table(BH_dat$cage)
+      # 年齢は連続変数でなく既にカテゴリ化されている。ただし現在はデータが文字列型なので因子型に変換。
+      # 参照とする値を決める。
+       BH_dat$cage = factor(BH_dat$cage ) 
+       str(BH_dat$cage) # '3-5 years'が参照値となっていることに留意
+  # 夏場にワラビを敷き草として使うか
+  table(BH_dat$fsummer2)
+    # 因子型に変換。今回は参照値を"No fern"に変更する
+    BH_dat$fsummer2 = factor(BH_dat$fsummer2,levels=c("No fern","Dry fern","Fresh fern","Not housed"))
+    str(BH_dat$fsummer2) #参照値が"No fern"に変更されたことを確認
+    
+# 連続変数の取る値を確認
+    table(BH_dat$.fgspr)
+```
+
+## Associations between explanatory variables 説明変数同士の関係を把握する
+```{r}
+# 説明変数同士の関係を把握する
+  #  exoticと他の変数
+    table(BH_dat$exotic,BH_dat$sexp)
+    chisq.test(BH_dat$exotic,BH_dat$sexp, correct=FALSE)
+
+    table(BH_dat$exotic,BH_dat$cage)
+    chisq.test(BH_dat$exotic,BH_dat$cage, correct=FALSE)
+
+    table(BH_dat$exotic,BH_dat$fsummer2)
+    chisq.test(BH_dat$exotic,BH_dat$fsummer2, correct=FALSE) #p-value = 0.0001132
+    
+    table(BH_dat$exotic,BH_dat$.fgspr)
+    chisq.test(BH_dat$exotic,BH_dat$.fgspr, correct=FALSE) #p-value = 2.868e-12
+
+  # gmodels packageのCrossTable functionが便利
+    library(gmodels)
+  # sexpと他の変数
+    CrossTable(BH_dat$sexp, BH_dat$cage,chisq = T) # p =  1.286262e-09 
+    
+    CrossTable(BH_dat$sexp, BH_dat$fsummer2,chisq = T) #  p =  0.2327552
+    
+    CrossTable(BH_dat$sexp, BH_dat$.fgspr,chisq = T) #  p =  0.6588869
+
+  # cageと他の変数
+    CrossTable(BH_dat$cage, BH_dat$fsummer2,chisq = T) # p =  0.003441523 
+          # 6 yearsはNot housedでない(屋内に入れられている)確率が高い
+    
+    CrossTable(BH_dat$cage, BH_dat$.fgspr,chisq = T) #  p =  0.4856489 
+    
+  # fsummer2と.fgspr
+    
+    CrossTable(BH_dat$fsummer2, BH_dat$.fgspr,chisq = T) #  p =  8.514364e-15
+          # Not housedは放牧される確率及び期間が長い
+
+```
+
+## Associations between outcome and each explanatory variable 目的変数と説明変数の関係性を把握する
+```{r, error = TRUE}
+# Univariable analysis 目的変数と説明変数の関係性を把握する
+
+  # 1 .fgspr この変数を連続変数として扱うべきかカテゴリカル変数として扱うべきか決定する
+    # まずカテゴリカル変数として係数を推定
+  model1 = glm(status~factor(.fgspr),data=BH_dat,family="binomial")
+  summary(model1)
+        # 月数と係数には単調な増減関係は認められない
+          # 参照値である(.fgspr)0と比較して(.fgspr)3の係数は0.7374で(.fgspr)2の1.5892 より減少している
+          # さらにp値を確認しても目的変数と強い関連があることが示唆される
+  
+      # この時点で.fgsprを連続変数として使ってはいけないことが明らかであるが、連続変数として扱った場合の係数を見てみる
+      model1_1 = glm(status~.fgspr,data=BH_dat,family="binomial")
+      summary(model1_1)
+            # 月数が1増えるごとに係数は0.2248増えるという推定結果
+            # カテゴリカル変数として扱った場合に確認された(.fgspr)3の係数が(.fgspr)2より低い、という結果と矛盾している
+            # よって.fgsprは連続変数として扱ってはいけない
+  
+  # 2 exotic
+  model2 = glm(status~exotic,data=BH_dat,family="binomial")
+  summary(model2)
+        # ここで注目すべきは係数とP値の両方
+        # 係数は0.26で、この変数が目的変数の値に与える影響は小さく、かつ
+        # P値は0.156で、「推定された係数が0ではない」という帰無仮説を却下できない、ことから
+        # この変数の係数は0である可能性がある、つまり目的変数に影響を与えない、可能性が高い。
+        # 今回はスクリーニングの基準をp=0.15としたので、この変数は多変量モデルでは考慮しない
+  
+  # 3 sexp
+  model3 = glm(status~sexp,data=BH_dat,family="binomial")
+  summary(model3)
+        # 同様に結果を解釈すると、オスはメスよりも係数が0.43低い
+        # P値は0.051で帰無仮説を棄却するエビデンスがある
+        # つまり性別は目的変数に影響を与える可能性が現段階ではある
+  
+  # 4 cage
+  model4 = glm(status~cage,data=BH_dat,family="binomial")
+  summary(model4)
+        # この変数は4つの値を取り、cage6 yearsの係数は0.08と0に近いうえ、P値も0.73と帰無仮説は却下できない
+        # しかしながらcage9+の係数は0.86と0と比較してかなり大きいうえ、P値も小さい
+        # このように変数の取る値によって目的変数との関係性が明確でない場合は次のアプローチをとる
+  
+  model_null = glm(status~NULL,data=BH_dat,family="binomial")
+        # NULLモデル、つまり説明変数が全く入っていないモデル（切片の推定だけされる）、を作る
+        # cageを説明変数として加えたmodel4はmodel_nullに比べてどれだけ目的変数の推定をより良くできているか？調べる
+        # model_nullとmodel4を尤度比検定して比べる
+        # lrtest function(lmtestパッケージ)を使う
+    lrtest(model4,model_null)
+        # 帰無仮説は「比較した2つのモデルのうち、より複雑なモデルは複雑でないモデルと比較してデータへのあてはまりが同じかそれ以下」
+        # P値が非常に小さい(p=0.001333)ということは、帰無仮説が却下される、つまり複雑なモデルのほうがデータへの当てはまりが良い
+        # つまりcageを入れたモデルの方が良いモデル、ということになる
+        # よってcageは目的変数と関連があり（因果関係とは限らない）多変量モデルに入れる候補となる
+    
+  # 5 fsummer2
+  model5 = glm(status~fsummer2,data=BH_dat,family="binomial")
+  summary(model5)
+        # cageと同様に尤度比検定してfsummer2と目的変数との関連を調べる
+  
+  lrtest(model5,model_null)
+  
+        #　ここで"models were not all fitted to the same size of dataset"というエラーが出る。
+        #  尤度比検定を行うために2つのルールを満たす必要がある。
+            #  ルール1: 尤度比検定を2つのモデルを比較するときに用いるためには、片方のモデルが他方の入れ子構造(nested)となっている必要がある
+              #  例えるならば青リンゴと赤リンゴはリンゴという果物(モデル)内で入れ子になっているので比較できる
+              #  一方、赤リンゴとオレンジは果物の種類が異なるので比較できない
+              #  ２つのモデルが入れ子であるという意味は、モデルBに含まれるパラメーターは全てモデルAに含まれているということである
+              #  つまりモデルAとB両方が、もう片方のモデルにないパラメーターを含む場合尤度比検定は行えない
+            #  ルール2: さらに尤度を計算する際、一つ一つの観察データーを(データでいう各行)使うためモデルAに含まれる行とモデルBに含まれる行が異なる場合も尤度比検定は行えない
+              #  今回model5とmodel_nullに含まれるデータは異なることに気が付いただろうか？
+              #  上で欠損データを確認した際に、fsummer2変数には欠損データがあった。
+              #　欠損データを含む変数をモデルに投入した場合、欠損値を含む行はパラメータ推定には使えないので自動的に除去される
+              #　どれだけデータがモデルに含まれているか以下のように確認できる
+              model_null
+                  # Degrees of Freedom: 608 Total NULLモデルのパラメータ数は1なのでデータの数は608+1=609
+              model5
+                  # Degrees of Freedom: 607 Total 同様にデータの数は607+1=608
+                  # model5は含まれるデータの数が一つ少ないことが分かる。これによって尤度比検定が行えない
+        # よって比較する2つのモデルが同じデータを含むようにすればよい
+        # fsummer2に欠損値を持つ行を除いてmodel_nullを作り直す。model_null2と命名する
+        model_null2 = glm(status~NULL,data=subset(BH_dat,!is.na(BH_dat$fsummer2)),family="binomial")
+                # subset関数を使いfsummer2に欠損値を持つデータを除外
+        lrtest(model5,model_null2)
+          # 無事尤度比検定を行えた
+          # ここでp値は1.546e-08と、fsummer2と目的変数の関連は強い
+         
+    # 最後に.fgsprのp値を求めておく
+        model_null3 = glm(status~NULL,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+        lrtest(model1,model_null3)
+        
+          # p = 4.488e-05
+        
+# 単変量解析の段階で目的変数との関連の強さはp値を基準とすると
+  # fsummer2 < .fgspr < cage < sexp < exotic
+  # これらのうちexoticは多変量モデルに投入する候補とならない
+
+```
+
+## Construct multivariable models 多変量モデル
+```{r, error = TRUE}
+# Multivariable analysis 多変量モデル
+
+# 多変量モデルを作る手順はいくつかパターンがある
+# 代表的なものはforward-selection, backward-selection, backward-forward-selection
+# 以下それぞれの手法を見ていく
+
+# Method 1: Forward selection
+# 始めにNULLモデル、つまり切片だけのモデルからスタートし各変数を重要度の順に従ってモデルに加えていく
+# 重要度は研究目的に沿って自分で決める。多く使われる指標は単変量解析時のp値の小さな順など
+
+multi_model_null = glm(status~NULL
+                          ,data=BH_dat,family="binomial")
+
+# Forward selection process
+# 最もp値が低かったfsummer2から順に入れていく
+
+# 変数一つ目
+  # fsummer2
+  
+  multi_model_F1 = glm(status~fsummer2
+                            ,data=BH_dat,family="binomial")
+    # このモデルは上のmodel5と同じモデルなので係数等確認する必要はない
+
+# 変数二つ目  
+  #　続いて各変数を一つづつ加え最もモデルのあてはまりに大きな影響を与える変数を決定する
+  # 交絡作用を評価するために変数を加えた際の係数の変化に注意する
+      # cage
+          multi_model_F2_1 = glm(status~fsummer2 + cage
+                                    ,data=BH_dat,family="binomial")
+          lrtest(multi_model_F1,multi_model_F2_1)
+            # p =0.0001858
+          summary(multi_model_F2_1)
+          summary(multi_model_F1)
+          # fsummer2の係数に大きな変化はない
+      # .fgspr
+          multi_model_F2_2 = glm(status~fsummer2 + factor(.fgspr)
+                                    ,data=BH_dat,family="binomial")
+          lrtest(multi_model_F1,multi_model_F2_2)
+            # Error 以前と同様にモデルに含まれるデータが欠損値の存在によって異なっている
+            # .fgsprに欠損値を持つデータを除く
+            multi_model_F1_fgspr = glm(status~fsummer2
+                                    ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+             lrtest(multi_model_F1_fgspr,multi_model_F2_2)
+             # p =0.004328
+          summary(multi_model_F2_2)
+          summary(multi_model_F1)
+          # fsummer2 Not housedの係数が若干変化している(0.9034-0.6719)/0.9034 = 0.25 つまり25%の変化
+          # 交絡作用の可能性があるので後できちんと解析するために覚えておく
+          
+      # sexp
+           multi_model_F2_3 = glm(status~fsummer2 + sexp
+                                    ,data=BH_dat,family="binomial")
+          lrtest(multi_model_F1,multi_model_F2_3)    
+            # p = 0.0241 
+          summary(multi_model_F2_3)
+          summary(multi_model_F1)
+           # 特に係数に変化はない
+  #  これらの中でcageのp値が最も低いので、次にcageをモデルに加える
+      
+# 変数三つ目
+  # 同様に残った変数を一つづつ加えていく
+    # .fgspr
+         multi_model_F3_1 = glm(status~fsummer2 + cage + factor(.fgspr)
+                                    ,data=BH_dat,family="binomial")
+              multi_model_F2_1_fgspr = glm(status~fsummer2 + cage
+                                        ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+          lrtest(multi_model_F2_1_fgspr,multi_model_F3_1) 
+          # p =0.003478
+          summary(multi_model_F3_1)
+          summary(multi_model_F2_1)
+            # やはりfsummer2 Not housedの係数に変化がみられる
+    # sexp
+           multi_model_F3_2 = glm(status~fsummer2 + cage + sexp
+                                    ,data=BH_dat,family="binomial")
+              multi_model_F2_1_sexp = glm(status~fsummer2 + cage
+                                        ,data=subset(BH_dat,!is.na(BH_dat$sexp)),family="binomial")
+          lrtest(multi_model_F2_1_sexp,multi_model_F3_2) 
+          # p =0.07736
+          summary(multi_model_F3_2)
+          summary(multi_model_F2_1)
+           # 特に係数に変化なし 
+  # 同様に.fgsprをモデルに加える
+
+# 変数四つ目
+  # 残りの変数はsexpのみ
+           multi_model_F4_1 = glm(status~fsummer2 + cage + factor(.fgspr) + sexp
+                                    ,data=BH_dat,family="binomial")
+           lrtest(multi_model_F3_1,multi_model_F4_1) 
+    # p = 0.06255
+           summary(multi_model_F4_1)
+           summary(multi_model_F3_1)
+            # cage6 yearsおよびcage7-8 yearsの係数に変化がみられる
+            # 例えばcage6 yearsの係数は(0.2000-0.1308)/0.2000 = 0.346と35%変化しており交絡作用とみなすことができる
+            # しかしながらこの係数のp値を見ると0.63936となっており、有意でない。
+            # つまり「cage6 yearsの係数は0でない」という帰無仮説を棄却できないので、この係数は0である可能性がある
+            # 0かもしれない係数が35%変化し、変化後も帰無仮説が棄却できていないので、この変化にはあまり意味がない
+            # つまりsexpの交絡作用は殆どない、と考える
+           
+    # 基準とするp=0.05に満たない、かつ交絡作用も認められないのでsexpはモデルに含めない
+   
+                   
+# モデルに加える変数が決まったので、これからそれらの交互作用をモデルに加えるか検討する
+# 交互作用を加えるうえでいくつか考慮する点がある
+# まず解釈可能な交互作用に絞ることが重要である。例えばfsummer2と.fgsprの交互作用が仮に統計的に優位だったとしても、その解釈は難しい
+# 今回はfsummer2cage .fgsprcage
+# 続いて交互作用が統計的に有意であるかは今までと同様に尤度比検定が使えるが、変数の有意性を確認するときと比べて検定力が落ちる
+# そのため変数を含める基準より緩い基準を使うことが多い(例えばp<0.1)
+
+  # fsummer2*cage
+     multi_model_F4_1 = glm(status~fsummer2 + cage + factor(.fgspr) + fsummer2*cage
+                                    ,data=BH_dat,family="binomial")      
+     lrtest(multi_model_F3_1,multi_model_F4_1)
+     # p =0.6157
+     
+  # .fgspr*cage
+      multi_model_F4_2 = glm(status~fsummer2 + cage + factor(.fgspr) + factor(.fgspr)*cage
+                                    ,data=BH_dat,family="binomial")      
+     lrtest(multi_model_F3_1,multi_model_F4_2)
+     # p = 0.2676
+
+  # ちなみに.fgspr*fsummer2を見てみる
+     multi_model_F4_3 = glm(status~fsummer2 + cage + factor(.fgspr) + factor(.fgspr)*fsummer2
+                                    ,data=BH_dat,family="binomial")      
+     lrtest(multi_model_F3_1,multi_model_F4_3)
+     summary(multi_model_F4_3)
+     # p = 0.0159
+     # 強い交互作用が見られる。しかしながら結果の解釈が非常に難しい
+     # 研究目的のために、この交互作用が重要な場合はもちろんモデルに含める
+     
+# 最終モデル
+summary(multi_model_F3_1)     
+
+  # fsummer2と.fgsprの交絡作用の考察
+  # fsummer2Not housedの係数が.fgsprをモデルに投入することで減少
+  # つまりfsummer2Not housedの目的変数に対する効果のいくつかは放牧期間によって説明される
+  # その理由として屋外に代われている牛は放牧される可能性が高い
+      table(BH_dat$fsummer2,BH_dat$.fgspr)
+      
+# ここで考察が終わりがちだが、cageの係数がfsummer2によって変化するか確認していない
+# fsummer2の係数についてはcage投入後に確認したが
+# cageの係数について確認するのを忘れやすいのはForward selectionを行う欠点である
+       summary(model4)
+       summary(multi_model_F2_1)
+    # cage9+yearsの係数はfsummer2の投入によって (1.0449- 0.86547)/1.0449=0.17つまり17%変化している
+    # 交絡要因とみなす基準はまちまちだが25%-35%の増減を基準とする場合が多い。今回はこれを交絡とはみなさない
+```
+
+```{r, error = TRUE}
+# Method 2: Backward elimination
+# 始めに単変量解析でスクリーニングした変数、およびそれらの交互作用を含んだモデルを作成（フルモデル）
+# 交互作用について：2変数間もしくはそれ以上の変数間の交互作用を作れるが通常3変数間以上の交互作用は解釈が難しい
+# よって2変数間の交互作用のみを今回は含める
+# またどの2変数間で交互作用を含めるかは研究の目的により異なる
+# 今回はfsummer2とcageの交互作用のみに着目する
+
+multi_model_full_B = glm(status~cage + factor(.fgspr) + fsummer2 + sexp +
+                         cage*fsummer2 
+                          ,data=BH_dat,family="binomial")
+summary(multi_model_full_B)
+
+# 一つ目の変数の除去
+# Backward elimination process
+    # cage*fsummer2
+    multi_model_full_B1_1 = glm(status~cage + factor(.fgspr) + fsummer2 + sexp
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_B1_1)
+    lrtest(multi_model_full_B,multi_model_full_B1_1)
+      # p = 0.5577
+    
+    # sexp
+    multi_model_full_B1_2 = glm(status~cage + factor(.fgspr) + fsummer2 + cage*fsummer2
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_B1_2)
+    lrtest(multi_model_full_B,multi_model_full_B1_2)
+      # p = 0.044
+    
+    # factor(.fgspr)
+    multi_model_full_B1_3 = glm(status~cage + sexp + fsummer2 + cage*fsummer2
+                              ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+    lrtest(multi_model_full_B,multi_model_full_B1_3)
+      # p = 0.005677
+
+  # cageとfsummer2は現在は除かない。なぜならこれらのうち1変数を除くと自動的にcage*fsummer2の交互作用を除くことになるため
+  # 除いた3変数のうち最もp値が高かったcage*fsummer2を除く
+    
+# 二つ目の変数の除去
+    # ここからは、変数除去によって変数の係数に変化があるか（交絡作用の有無）慎重に観察する
+# Backward elimination process
+    # sexp
+    multi_model_full_B2_1 = glm(status~cage + factor(.fgspr) + fsummer2
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_B2_1)
+    lrtest(multi_model_full_B1_1,multi_model_full_B2_1)
+      # p = 0.06255
+    
+    # fsummer2
+    multi_model_full_B2_2 = glm(status~cage + factor(.fgspr) + sexp
+                              ,data=subset(BH_dat,!is.na(BH_dat$fsummer2)),family="binomial")
+    summary(multi_model_full_B2_2)
+      ### cageの係数がfsummer2を除く前と比較して(multi_model_full_B1_1)大幅に変化している
+      ### cageとfsummer2の間には交絡が起こっている可能性あり
+    lrtest(multi_model_full_B1_1,multi_model_full_B2_2)
+      # p = 2.221e-07
+    
+    # factor(.fgspr)
+    multi_model_full_B2_3 = glm(status~cage  + fsummer2 + sexp
+                              ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+    summary(multi_model_full_B2_3)
+    lrtest(multi_model_full_B1_1,multi_model_full_B2_3)
+      # p = 0.003029    
+    
+    # cage
+     multi_model_full_B2_4 = glm(status~sexp + factor(.fgspr) + fsummer2
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_B2_4)
+    lrtest(multi_model_full_B1_1,multi_model_full_B2_4)
+      # p =  0.0003071
+    
+    # sexpを除いた際のp値のみが基準とするp<0.05より高いので(0.06)sexpを除く
+    
+    
+# 三つ目の変数の除去
+    # 引き続き変数除去によって変数の係数に変化があるか（交絡作用の有無）慎重に観察する
+# Backward elimination process
+    
+    # fsummer2
+    multi_model_full_B3_1 = glm(status~cage + factor(.fgspr) 
+                              ,data=subset(BH_dat,!is.na(BH_dat$fsummer2)),family="binomial")
+    summary(multi_model_full_B3_1)
+    # 比較対象はfsummer2を除く前のmulti_model_full_B2_1
+    summary(multi_model_full_B2_1)
+      ### cageおよび.fgspr両方の係数に変化が認められる
+    lrtest(multi_model_full_B2_1,multi_model_full_B3_1)
+      # p = 2.679e-07
+    
+    # factor(.fgspr)
+    multi_model_full_B3_2 = glm(status~cage  + fsummer2
+                              ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+    summary(multi_model_full_B3_2)
+      ### cageの係数の変化はほぼなし
+    lrtest(multi_model_full_B2_1,multi_model_full_B3_2)
+      # p = 0.003478    
+    
+    # cage
+     multi_model_full_B3_3 = glm(status~factor(.fgspr)  + fsummer2
+                              ,data=subset(BH_dat,!is.na(BH_dat$cage)),family="binomial")
+    summary(multi_model_full_B3_3)
+    lrtest(multi_model_full_B2_1,multi_model_full_B3_3)
+      # p =0.0001258
+   # 全ての変数において、それらの除去が有意なP値を取るのでモデルから除去できない
+# 最終モデルは　multi_model_full_B2_1
+```
+
+
+```{r, error = TRUE}
+# Method 3: Backward elimination + forward selection
+# Backward eliminationのみのプロセスと同様、始めに単変量解析でスクリーニングした変数、およびそれらの交互作用を含んだモデルを作成（フルモデル）
+# Method 2との違いはBackward eliminationで変数を除去するたびに、既に除去された変数(もしくは交互作用)をモデルに戻す
+# この作業によって特定の変数の存在によって隠れていた関係を(その変数を除くことで)明らかにできる可能性がある
+
+multi_model_full_BF = glm(status~cage + factor(.fgspr) + fsummer2 + sexp +
+                         cage*fsummer2 
+                          ,data=BH_dat,family="binomial")
+summary(multi_model_full_BF)
+
+# 一つ目の変数の除去
+# Backward elimination process
+    # cage*fsummer2
+    multi_model_full_BF1_1 = glm(status~cage + factor(.fgspr) + fsummer2 + sexp
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_BF1_1)
+    lrtest(multi_model_full_BF,multi_model_full_BF1_1)
+      # p = 0.5577
+    
+    # sexp
+    multi_model_full_BF1_2 = glm(status~cage + factor(.fgspr) + fsummer2 + cage*fsummer2
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_BF1_2)
+    lrtest(multi_model_full_BF,multi_model_full_BF1_2)
+      # p = 0.044
+    
+    # factor(.fgspr)
+    multi_model_full_BF1_3 = glm(status~cage + sexp + fsummer2 + cage*fsummer2
+                              ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+    lrtest(multi_model_full_BF,multi_model_full_BF1_3)
+      # p = 0.005677
+
+  # cageとfsummer2は現在は除かない。なぜならこれらのうち1変数を除くと自動的にcage*fsummer2の交互作用を除くことになるため
+  # 除いた3変数のうち最もp値が高かったcage*fsummer2を除く
+    
+# 二つ目の変数の除去
+    # ここからは、変数除去によって変数の係数に変化があるか（交絡作用の有無）慎重に観察する
+# Backward elimination process
+    # sexp
+    multi_model_full_BF2_1 = glm(status~cage + factor(.fgspr) + fsummer2
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_BF2_1)
+    lrtest(multi_model_full_BF1_1,multi_model_full_BF2_1)
+      # p = 0.06255
+    
+    # fsummer2
+    multi_model_full_BF2_2 = glm(status~cage + factor(.fgspr) + sexp
+                              ,data=subset(BH_dat,!is.na(BH_dat$fsummer2)),family="binomial")
+    summary(multi_model_full_BF2_2)
+      ### cageの係数がfsummer2を除く前と比較して(multi_model_full_BF1_1)大幅に変化している
+      ### cageとfsummer2の間には交絡が起こっている可能性あり
+    lrtest(multi_model_full_BF1_1,multi_model_full_BF2_2)
+      # p = 2.221e-07
+    
+    # factor(.fgspr)
+    multi_model_full_BF2_3 = glm(status~cage  + fsummer2 + sexp
+                              ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+    summary(multi_model_full_BF2_3)
+    lrtest(multi_model_full_BF1_1,multi_model_full_BF2_3)
+      # p = 0.003029    
+    
+    # cage
+     multi_model_full_BF2_4 = glm(status~sexp + factor(.fgspr) + fsummer2
+                              ,data=BH_dat,family="binomial")
+    summary(multi_model_full_BF2_4)
+    lrtest(multi_model_full_BF1_1,multi_model_full_BF2_4)
+      # p =  0.0003071
+    
+    # sexpを除いた際のp値のみが基準とするp<0.05より高いので(0.06)sexpを除く
+    
+# Forward selection process
+    # ここで既に除いた変数をモデルに戻し(forward selection)変数が本当に目的変数と関連がないか調べる
+    # 既に除いた変数はcage*fsummer2とsexpだが、後者は今除いたばかりなので前者のみ戻す
+    # (sexpを戻すとmulti_model_full_BF2_1になるだけ)
+    
+    multi_model_full_BF2_1_1 = glm(status~cage + factor(.fgspr) + fsummer2 + cage*fsummer2
+                              ,data=BH_dat,family="binomial")
+    lrtest(multi_model_full_BF2_1,multi_model_full_BF2_1_1)
+      # p = 0.6157 なのでモデルには加えない
+    
+    
+    
+# 三つ目の変数の除去
+    # 引き続き変数除去によって変数の係数に変化があるか（交絡作用の有無）慎重に観察する
+# Backward elimination process
+    
+    # fsummer2
+    multi_model_full_BF3_1 = glm(status~cage + factor(.fgspr) 
+                              ,data=subset(BH_dat,!is.na(BH_dat$fsummer2)),family="binomial")
+    summary(multi_model_full_BF3_1)
+    # 比較対象はfsummer2を除く前のmulti_model_full_BF2_1
+    summary(multi_model_full_BF2_1)
+      ### cageおよび.fgspr両方の係数に変化が認められる
+    lrtest(multi_model_full_BF2_1,multi_model_full_BF3_1)
+      # p = 2.679e-07
+    
+    # factor(.fgspr)
+    multi_model_full_BF3_2 = glm(status~cage  + fsummer2
+                              ,data=subset(BH_dat,!is.na(BH_dat$.fgspr)),family="binomial")
+    summary(multi_model_full_BF3_2)
+      ### cageの係数の変化はほぼなし
+    lrtest(multi_model_full_BF2_1,multi_model_full_BF3_2)
+      # p = 0.003478    
+    
+    # cage
+     multi_model_full_BF3_3 = glm(status~factor(.fgspr)  + fsummer2
+                              ,data=subset(BH_dat,!is.na(BH_dat$cage)),family="binomial")
+    summary(multi_model_full_BF3_3)
+    lrtest(multi_model_full_BF2_1,multi_model_full_BF3_3)
+      # p =0.0001258
+   # 全ての変数において、それらの除去が有意なP値を取るのでモデルから除去できない
+    
+# Forward selection process
+    #　同様に既に除いた変数をモデルに戻し(forward selection)変数が本当に目的変数と関連がないか調べる
+    # しかし今回のElimination processでは変数を除去しなかったので現在選択しているモデルはmulti_model_full_BF2_1のまま
+    # よって上のmulti_model_full_BF2_1_1のステップと同一であるので変数を加える必要はない
+    
+    multi_model_full_BF3_1_1 = glm(status~cage + factor(.fgspr) + fsummer2 + cage*fsummer2
+                              ,data=BH_dat,family="binomial")
+    lrtest(multi_model_full_BF2_1,multi_model_full_BF2_1_1)
+      # p = 0.6157 なのでモデルには加えない
+    
+### 結論
+###  選択したモデルはmulti_model_full_BF2_1
+### 交絡作用について考察するため再びモデルの係数を観察する
+    # 最終モデル
+      multi_model_full_BF2_1 = glm(status~cage + factor(.fgspr) + fsummer2
+                              ,data=BH_dat,family="binomial")
+    
+      
+    # 最終モデルからfsummer2を除いたモデル
+      multi_model_full_BF2_1_unadjusted = glm(status~cage + factor(.fgspr) 
+                              ,data=BH_dat,family="binomial")
+      
+    # 比較
+      summary(multi_model_full_BF2_1)$coefficients
+      summary(multi_model_full_BF2_1_unadjusted)$coefficients
+      
+    # cageとfsummer2の関係について
+      # fsummer2を入れることでのcageの係数が上昇している。例えばcage6 yearsの係数は0.0985045から0.2000198になっている
+      # (0.2000198-0.0985045)/0.0985045 = 1.03つまり係数は100％上昇しているが、係数のp値は有意でなくこの上昇が意味があるものか判断できない
+      # これを交絡作用としては考えない
+    
+
+```
